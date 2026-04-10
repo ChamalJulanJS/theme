@@ -1,0 +1,299 @@
+<?php
+/**
+ * The template for displaying product content in the single-product.php template
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+global $product;
+
+do_action( 'woocommerce_before_single_product' );
+
+if ( post_password_required() ) {
+    echo get_the_password_form(); // WPCS: XSS ok.
+    return;
+}
+?>
+<style>
+/* EDITORIAL / MINIMALIST PRODUCT LAYOUT */
+body { background-color: #ffffff; color: #111; font-family: 'Inter', sans-serif; }
+
+/* Swatches - Minimalist */
+.variations-table { width: 100%; margin-bottom: 2rem; }
+.woocommerce div.product form.cart table.variations select { display: none !important; }
+.woocommerce div.product form.cart table.variations th { display: none; } /* Hide labels for ultra-minimalist look */
+.woocommerce div.product form.cart table.variations td.label { padding:0; margin:0; }
+
+.swatches-wrapper { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.size-swatch { 
+    display: inline-flex; align-items: center; justify-content: center; 
+    min-width: 3rem; height: 2.25rem; border: 1px solid #d4d4d4; background: #fff; 
+    color: #555; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; padding: 0 0.75rem;
+}
+.size-swatch:hover { border-color: #111; color: #111; }
+.size-swatch.active { border-color: #111; box-shadow: inset 0 0 0 1px #111; color: #111; font-weight: 500;}
+
+/* Action Row (Quantity + Add to Cart) */
+.woocommerce-variation-add-to-cart {
+    display: flex; gap: 0.5rem; align-items: stretch; margin-top: 2rem; flex-wrap: wrap;
+}
+.quantity {
+    display: flex; border: 1px solid #d4d4d4; align-items: center; height: 3rem; background: #fff; max-width: 140px;
+}
+.quantity input[type="number"] {
+    width: 50px; text-align: center; border: none; font-weight: 600; font-size: 0.95rem; -moz-appearance: textfield; padding: 0; outline: none; background: transparent; color: #111;
+}
+.quantity input[type="number"]::-webkit-outer-spin-button,
+.quantity input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+}
+.qty-btn { 
+    padding: 0 1rem; font-size: 1.1rem; font-weight: 500; cursor: pointer; color: #111; background: none; border: none; outline: none; transition: background 0.2s; height: 100%;
+}
+.qty-btn:hover { background-color: #f5f5f5; }
+
+/* Cart Button - Specific solid gray matching reference */
+.single_add_to_cart_button {
+    flex: 1; background-color: #8c8c8c; color: #fff; border: none; font-weight: 700; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; cursor: not-allowed; transition: background 0.2s; min-width: 200px; height: 3rem; display: flex; align-items: center; justify-content: center;
+}
+.single_add_to_cart_button.active {
+    background-color: #8c8c8c; cursor: pointer; /* Stays gray but clickable */
+}
+.single_add_to_cart_button.active:hover { background-color: #666; }
+
+/* Horizontal Gallery Layout */
+.editorial-gallery {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 0; border: 1px solid #f0f0f0; background: #fcfcfc;
+}
+.editorial-gallery::-webkit-scrollbar { height: 4px; }
+.editorial-gallery::-webkit-scrollbar-thumb { background: #ddd; }
+.editorial-gallery-item {
+    flex: 0 0 100%; scroll-snap-align: start; padding: 2rem; display: flex; align-items: center; justify-content: center; border-right: 1px solid #f0f0f0;
+}
+@media(min-width: 768px) {
+    /* Show 4 side by side seamlessly on larger screens to match image 1 */
+    .editorial-gallery-item { flex: 0 0 25%; padding: 1rem; }
+}
+.editorial-gallery-item img { max-width: 100%; height: auto; object-fit: contain; mix-blend-multiply: true; }
+
+/* Meta */
+.product_meta { margin-top: 2rem; font-size: 0.8rem; color: #777; line-height: 1.8; padding-top: 2rem; border-top: 1px solid #f5f5f5; }
+.product_meta span { display: block; }
+.product_meta a { color: #111; text-decoration: none; }
+.product_meta a:hover { text-decoration: underline; }
+
+/* NO TABS - Continuous Editorial Flow */
+.woocommerce-tabs ul.tabs { display: none !important; }
+.woocommerce-tabs .panel { display: block !important; border: none !important; box-shadow: none !important; background: transparent !important; padding: 4rem 0 !important; }
+.woocommerce-tabs .panel h2 { display: none; }
+
+/* Editorial Prose for Description */
+.editorial-prose {
+    max-width: 100%; font-size: 0.95rem; line-height: 1.8; color: #333; margin: 0 auto;
+}
+.editorial-prose img { width: 100%; height: auto; margin-bottom: 2rem; }
+/* Simulating a staggered masonry layout if user adds images and paragraphs */
+@media(min-width: 1024px) {
+    .editorial-prose {
+        column-count: 2; column-gap: 4rem; column-fill: balance;
+    }
+    .editorial-prose p { break-inside: avoid; margin-bottom: 2rem; }
+    .editorial-prose img { break-inside: avoid; width: 100%; margin-bottom: 2rem; }
+}
+
+.reset_variations { display: none !important; }
+</style>
+
+<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'pt-16 pb-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12', $product ); ?>>
+
+    <!-- THE PRODUCT HEAD PANEL -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-20">
+        
+        <!-- Left Side: Horizontal Strip Gallery (Span 8) -->
+        <div class="lg:col-span-8 flex items-center bg-[#f9f9f9]">
+            <?php
+            $main_image_id = $product->get_image_id();
+            $gallery_image_ids = $product->get_gallery_image_ids();
+            $all_images = array_merge( 
+                $main_image_id ? array($main_image_id) : array(), 
+                $gallery_image_ids 
+            );
+            ?>
+            <div class="editorial-gallery w-full">
+                <?php if ( ! empty( $all_images ) ) : ?>
+                    <?php foreach ($all_images as $img_id) : ?>
+                        <div class="editorial-gallery-item bg-[#f4f4f4] transition duration-500 hover:bg-[#eaeaea]">
+                            <?php echo wp_get_attachment_image( $img_id, 'full', false, array( 'class' => 'w-full h-auto object-contain mix-blend-multiply drop-shadow-sm' ) ); ?>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="editorial-gallery-item">
+                        <span class="text-gray-400 text-sm tracking-widest uppercase">No Image Available</span>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Right Side: Details Box (Span 4) -->
+        <div class="lg:col-span-4 flex flex-col justify-center py-4">
+            <!-- Title -->
+            <h1 class="text-[1.35rem] uppercase font-bold text-[#111] leading-snug tracking-wide mb-3">
+                <?php the_title(); ?>
+            </h1>
+            
+            <!-- Price -->
+            <div class="mb-8">
+                <div class="text-[1.05rem] font-semibold text-[#111] tracking-tight">
+                    <?php echo $product->get_price_html(); ?>
+                </div>
+            </div>
+
+            <!-- Add to Cart Form -->
+            <div class="mb-4">
+                <?php woocommerce_template_single_add_to_cart(); ?>
+            </div>
+            
+            <!-- Wishlist Area -->
+            <div class="mt-6 flex items-center gap-3 text-[#111] cursor-pointer hover:opacity-70 transition-opacity w-max text-xs font-semibold uppercase tracking-wider">
+                <!-- Solid minimal heart icon matching reference -->
+                <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+                Add to wishlist
+            </div>
+            
+            <!-- Extra Product Meta -->
+            <div class="product_meta tracking-wide font-medium">
+                <?php if ( wc_product_sku_enabled() && ( $product->get_sku() || $product->is_type( 'variable' ) ) ) : ?>
+                    <span class="sku_wrapper mb-1">SKU: <span class="sku font-normal"><?php echo ( $sku = $product->get_sku() ) ? $sku : esc_html__( 'N/A', 'woocommerce' ); ?></span></span>
+                <?php endif; ?>
+                <?php echo wc_get_product_category_list( $product->get_id(), ', ', '<span class="posted_in mb-1">Category: <span class="font-normal">', '</span></span>' ); ?>
+                <?php echo wc_get_product_tag_list( $product->get_id(), ', ', '<span class="tagged_as">Tags: <span class="font-normal">', '</span></span>' ); ?>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- THE EDITORIAL DESCRIPTION FLOW (Replaces Tabs) -->
+    <div class="border-t border-[#eee] mt-12 w-full">
+        <!-- We wrap the tab output in our editorial prose class -->
+        <div class="editorial-prose">
+            <?php do_action( 'woocommerce_after_single_product_summary' ); ?>
+        </div>
+    </div>
+
+</div>
+
+<?php do_action( 'woocommerce_after_single_product' ); ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Swatches and Custom Add to Cart Setup
+    const variationForms = document.querySelectorAll('.variations_form');
+    
+    variationForms.forEach(form => {
+        const selects = form.querySelectorAll('table.variations select');
+        
+        // Custom Quantity Buttons (injecting layout)
+        const qtyWrap = form.querySelector('.quantity');
+        if (qtyWrap && !qtyWrap.querySelector('.qty-btn.minus')) {
+            const qtyInput = qtyWrap.querySelector('input.qty');
+            
+            const minusBtn = document.createElement('button');
+            minusBtn.type = 'button'; minusBtn.className = 'qty-btn minus'; minusBtn.textContent = '-';
+            
+            const plusBtn = document.createElement('button');
+            plusBtn.type = 'button'; plusBtn.className = 'qty-btn plus'; plusBtn.textContent = '+';
+            
+            qtyWrap.insertBefore(minusBtn, qtyInput);
+            qtyWrap.appendChild(plusBtn);
+            
+            minusBtn.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value || 1);
+                if(val > 1) {
+                    qtyInput.value = val - 1;
+                    jQuery(qtyInput).trigger('change');
+                }
+            });
+            
+            plusBtn.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value || 1);
+                let max = parseInt(qtyInput.getAttribute('max') || 9999);
+                if(val < max) {
+                    qtyInput.value = val + 1;
+                    jQuery(qtyInput).trigger('change');
+                }
+            });
+        }
+
+        // Custom Swatches
+        selects.forEach(select => {
+            const parentTd = select.closest('td.value');
+            if(!parentTd) return;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'swatches-wrapper';
+            
+            // Look for color hints for circles vs text
+            const isColor = select.getAttribute('name').toLowerCase().includes('color');
+            
+            Array.from(select.options).forEach(opt => {
+                if(!opt.value) return; 
+                
+                const btn = document.createElement('div');
+                
+                if(isColor) {
+                    // Try to guess a color style or just show a colored dot beside text
+                    btn.className = 'size-swatch flex items-center gap-2';
+                    btn.innerHTML = `<span style="width:10px;height:10px;border-radius:50%;background:${opt.value.toLowerCase()};display:inline-block;border:1px solid #ccc;"></span> ${opt.text}`;
+                } else {
+                    btn.className = 'size-swatch';
+                    btn.textContent = opt.text;
+                }
+                
+                btn.addEventListener('click', () => {
+                    Array.from(wrapper.children).forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    select.value = opt.value;
+                    jQuery(select).trigger('change');
+                });
+                
+                wrapper.appendChild(btn);
+            });
+            
+            parentTd.appendChild(wrapper);
+        });
+        
+        // Add to cart state logic
+        const addToCartBtn = form.querySelector('.single_add_to_cart_button');
+        
+        jQuery(form).on('found_variation', function(event, variation) {
+            if(variation.is_purchasable && variation.is_in_stock) {
+                addToCartBtn.classList.add('active');
+                if(addToCartBtn.tagName.toLowerCase() === 'button') {
+                    addToCartBtn.disabled = false;
+                }
+            } else {
+                addToCartBtn.classList.remove('active');
+                if(addToCartBtn.tagName.toLowerCase() === 'button') {
+                    addToCartBtn.disabled = true;
+                }
+            }
+        });
+        
+        jQuery(form).on('reset_image reset_data', function() {
+            addToCartBtn.classList.remove('active');
+            if(addToCartBtn.tagName.toLowerCase() === 'button') {
+                addToCartBtn.disabled = true;
+            }
+            form.querySelectorAll('.size-swatch').forEach(c => c.classList.remove('active'));
+        });
+        
+        // Initial button state
+        if(addToCartBtn && addToCartBtn.tagName.toLowerCase() === 'button') {
+            addToCartBtn.disabled = true;
+        }
+    });
+
+});
+</script>
