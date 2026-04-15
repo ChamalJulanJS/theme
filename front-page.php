@@ -23,14 +23,14 @@ get_header(); ?>
             <span class="text-premium-400 font-bold tracking-[0.3em] uppercase mb-4 text-sm animate-pulse">New Collection 2026</span>
             <h1 class="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight mb-8 drop-shadow-2xl leading-tight">Step Into The <span class="text-premium-500">Future</span></h1>
             <p class="text-lg md:text-xl font-medium text-gray-200 mb-10 max-w-2xl mx-auto hidden sm:block">Discover the pinnacle of minimalist luxury and modern design. Elevate your stride today.</p>
-            <a href="#featured-products" class="group relative inline-flex items-center justify-center px-8 py-4 text-sm font-bold tracking-widest text-white uppercase bg-premium-500 overflow-hidden rounded-none hover:bg-premium-600 transition-colors duration-300">
+            <a href="<?php echo esc_url( wc_get_page_permalink('shop') ); ?>" class="group relative inline-flex items-center justify-center px-8 py-4 text-sm font-bold tracking-widest text-white uppercase bg-premium-500 overflow-hidden rounded-none hover:bg-premium-600 transition-colors duration-300">
                 <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
                 <span class="relative">Shop New Arrivals &rarr;</span>
             </a>
         </div>
     </section>
 
-    <!-- CATEGORIES GRID -->
+    <!-- CATEGORIES GRID — Dynamic from WooCommerce -->
     <section class="py-24 bg-white">
         <div class="container-premium">
             <div class="text-center mb-16">
@@ -38,38 +38,65 @@ get_header(); ?>
                 <div class="w-16 h-1 bg-premium-500 mx-auto"></div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Deck Shoes Category -->
-                <div class="group relative h-[400px] overflow-hidden rounded-xl shadow-lg cursor-pointer">
-                    <div class="absolute inset-0 bg-dark/30 z-10 group-hover:bg-dark/50 transition-colors duration-500"></div>
-                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800" alt="Deck Shoes" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out">
-                    <div class="absolute inset-x-0 bottom-0 z-20 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <h3 class="text-3xl font-black text-white uppercase tracking-widest mb-2">Deck Shoes</h3>
-                        <a href="#" class="inline-flex items-center text-premium-400 font-bold uppercase text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">View Collection <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    </div>
-                </div>
+            <?php
+            // Fallback images for categories without thumbnails
+            $ff_fallback_images = array(
+                'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800',
+                'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=80&w=800',
+                'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&q=80&w=800',
+                'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800',
+                'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=80&w=800',
+            );
 
-                <!-- Heels Category -->
-                <div class="group relative h-[400px] overflow-hidden rounded-xl shadow-lg cursor-pointer">
+            $ff_home_cats = get_terms( array(
+                'taxonomy'   => 'product_cat',
+                'parent'     => 0,
+                'hide_empty' => true,
+                'orderby'    => 'count',
+                'order'      => 'DESC',
+                'number'     => 3,
+                'exclude'    => array( get_option('default_product_cat') ), // exclude "Uncategorized"
+            ) );
+
+            if ( ! empty( $ff_home_cats ) && ! is_wp_error( $ff_home_cats ) ) :
+            ?>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <?php foreach ( $ff_home_cats as $idx => $cat ) :
+                    $cat_thumb_id = get_term_meta( $cat->term_id, 'thumbnail_id', true );
+                    $cat_image    = $cat_thumb_id ? wp_get_attachment_image_url( $cat_thumb_id, 'large' ) : ( $ff_fallback_images[ $idx % count($ff_fallback_images) ] ?? $ff_fallback_images[0] );
+                    $cat_link     = get_term_link( $cat );
+                    $cat_count    = $cat->count;
+                    
+                    // Last card spans full on md if odd total
+                    $extra_class  = '';
+                    if ( count($ff_home_cats) > 1 && $idx === count($ff_home_cats) - 1 && count($ff_home_cats) % 2 !== 0 ) {
+                        $extra_class = 'md:col-span-2 lg:col-span-1';
+                    }
+                ?>
+                <div class="group relative h-[400px] overflow-hidden rounded-xl shadow-lg cursor-pointer <?php echo esc_attr( $extra_class ); ?>">
                     <div class="absolute inset-0 bg-dark/30 z-10 group-hover:bg-dark/50 transition-colors duration-500"></div>
-                    <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=80&w=800" alt="Heels" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out">
+                    <img src="<?php echo esc_url( $cat_image ); ?>" alt="<?php echo esc_attr( $cat->name ); ?>" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy">
                     <div class="absolute inset-x-0 bottom-0 z-20 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <h3 class="text-3xl font-black text-white uppercase tracking-widest mb-2">Statement Heels</h3>
-                        <a href="#" class="inline-flex items-center text-premium-400 font-bold uppercase text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">View Collection <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                        <h3 class="text-3xl font-black text-white uppercase tracking-widest mb-1"><?php echo esc_html( $cat->name ); ?></h3>
+                        <p class="text-white/70 text-sm mb-3"><?php echo $cat_count; ?> <?php echo $cat_count === 1 ? 'Product' : 'Products'; ?></p>
+                        <a href="<?php echo esc_url( $cat_link ); ?>" class="inline-flex items-center text-premium-400 font-bold uppercase text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">View Collection <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
                     </div>
                 </div>
-                
-                <!-- Accessories Category Placeholder -->
-                <div class="group relative h-[400px] overflow-hidden rounded-xl shadow-lg cursor-pointer lg:col-span-1 md:col-span-2 lg:col-auto">
-                    <div class="absolute inset-0 bg-dark/40 z-10 group-hover:bg-dark/60 transition-colors duration-500"></div>
-                    <!-- Leather wallet/bag background -->
-                    <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800&auto=format&fit=crop" alt="Accessories" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out">
-                    <div class="absolute inset-x-0 bottom-0 z-20 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <h3 class="text-3xl font-black text-white uppercase tracking-widest mb-2">Accessories</h3>
-                        <a href="#" class="inline-flex items-center text-premium-400 font-bold uppercase text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">View Collection <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                <?php endforeach; ?>
+            </div>
+            <?php else : ?>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="group relative h-[400px] overflow-hidden rounded-xl shadow-lg cursor-pointer">
+                    <div class="absolute inset-0 bg-dark/30 z-10 group-hover:bg-dark/50 transition-colors duration-500"></div>
+                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800" alt="Shop" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out">
+                    <div class="absolute inset-x-0 bottom-0 z-20 p-8">
+                        <h3 class="text-3xl font-black text-white uppercase tracking-widest mb-2">Shop All</h3>
+                        <a href="<?php echo esc_url( wc_get_page_permalink('shop') ); ?>" class="inline-flex items-center text-premium-400 font-bold uppercase text-sm">View Collection &rarr;</a>
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -148,15 +175,38 @@ get_header(); ?>
         <div class="absolute -bottom-[50%] -left-[10%] w-[80%] h-[200%] bg-yellow-300 rounded-full blur-[150px] opacity-20 mix-blend-overlay pointer-events-none"></div>
         
         <div class="container-premium relative z-10">
-            <div class="max-w-2xl mx-auto text-center bg-white/10 backdrop-blur-md p-10 md:p-16 rounded-3xl shadow-2xl border border-white/20">
-                <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tight mb-4 drop-shadow-md">Join the Inner Circle</h2>
-                <p class="text-premium-100 text-lg mb-10">Subscribe for exclusive drops, early sale access, and VIP events.</p>
+            <div class="max-w-2xl mx-auto text-center bg-white/10 backdrop-blur-md p-10 md:p-16 rounded-3xl shadow-2xl border border-white/20"
+                 x-data="{ email: '', submitted: false, loading: false }">
                 
-                <form class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto" onsubmit="event.preventDefault();">
-                    <input type="email" placeholder="Your Email Address" required 
-                           class="flex-1 px-6 py-4 bg-white text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-white/50 font-medium placeholder-gray-400 transition-shadow">
-                    <button type="submit" class="px-8 py-4 bg-dark text-white font-bold uppercase tracking-widest rounded-xl hover:bg-black transition-colors shadow-lg">Subscribe</button>
-                </form>
+                <template x-if="!submitted">
+                    <div>
+                        <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tight mb-4 drop-shadow-md">Join the Inner Circle</h2>
+                        <p class="text-premium-100 text-lg mb-10">Subscribe for exclusive drops, early sale access, and VIP events.</p>
+                        
+                        <form class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto" 
+                              @submit.prevent="loading = true; fetch(ffAjax.url, { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: 'action=ff_newsletter_subscribe&nonce=' + ffAjax.nonce + '&email=' + encodeURIComponent(email) }).then(r => r.json()).then(d => { loading = false; submitted = true; });">
+                            <input type="email" placeholder="Your Email Address" required x-model="email"
+                                   class="flex-1 px-6 py-4 bg-white text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-white/50 font-medium placeholder-gray-400 transition-shadow">
+                            <button type="submit" class="px-8 py-4 bg-dark text-white font-bold uppercase tracking-widest rounded-xl hover:bg-black transition-colors shadow-lg flex items-center justify-center gap-2" :disabled="loading">
+                                <template x-if="loading">
+                                    <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                </template>
+                                <span x-text="loading ? 'Subscribing...' : 'Subscribe'"></span>
+                            </button>
+                        </form>
+                    </div>
+                </template>
+
+                <template x-if="submitted">
+                    <div class="py-8" x-transition>
+                        <div class="ff-newsletter-check mx-auto mb-6">
+                            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-3xl font-black uppercase tracking-tight mb-3">Welcome to the Circle!</h3>
+                        <p class="text-premium-100 text-lg">You'll be the first to know about exclusive drops and VIP events.</p>
+                    </div>
+                </template>
+
             </div>
         </div>
     </section>

@@ -85,6 +85,17 @@ $shop_base_url   = ff_get_base_shop_url();
 $current_cat_slug = isset( $_GET['product_cat'] ) ? sanitize_text_field( $_GET['product_cat'] ) : '';
 ?>
 
+<!-- Breadcrumb Navigation -->
+<nav class="ff-breadcrumb" aria-label="Breadcrumb">
+    <?php woocommerce_breadcrumb( array(
+        'delimiter'   => ' <span class="ff-breadcrumb-sep">/</span> ',
+        'wrap_before' => '<div class="ff-breadcrumb-inner">',
+        'wrap_after'  => '</div>',
+        'before'      => '<span>',
+        'after'       => '</span>',
+    ) ); ?>
+</nav>
+
 <!-- Mobile Filter Button -->
 <div class="ff-mobile-filter-bar">
     <button class="ff-mobile-filter-btn" id="ff-filter-open-btn" aria-label="Open Filters">

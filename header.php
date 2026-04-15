@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php wp_head(); ?>
 </head>
-<body <?php body_class('bg-gray-50 flex flex-col min-h-screen text-dark font-sans'); ?> x-data="{ mobileMenuOpen: false, cartOpen: false }" :class="{'overflow-hidden': mobileMenuOpen || cartOpen}">
+<body <?php body_class('bg-gray-50 flex flex-col min-h-screen text-dark font-sans'); ?> x-data="{ mobileMenuOpen: false, cartOpen: false, searchOpen: false, searchQuery: '', searchResults: [], searchLoading: false }" :class="{'overflow-hidden': mobileMenuOpen || cartOpen || searchOpen}">
 <?php wp_body_open(); ?>
 
 <header class="sticky top-0 z-[100] bg-white/80 backdrop-blur-2xl border-b border-gray-100 shadow-sm w-full transition-all duration-300 group/header relative">
@@ -24,7 +24,6 @@
 
             <?php
             // ── Dynamic Mega Menu ──────────────────────────────────────────
-            // Get top-level items from 'Primary Mega Menu' (Appearance → Menus)
             $ff_mega_raw   = wp_get_nav_menu_items( get_nav_menu_locations()['primary-mega'] ?? 0 );
             $ff_top_items  = [];
             if ( $ff_mega_raw ) {
@@ -34,7 +33,6 @@
                     }
                 }
             }
-            // Fallback: use top-level WooCommerce categories if no menu assigned
             if ( empty( $ff_top_items ) ) {
                 $ff_fallback_cats = get_terms( [
                     'taxonomy'   => 'product_cat',
@@ -51,11 +49,9 @@
                 <ul class="flex items-center gap-10 font-bold text-xs uppercase tracking-[0.15em] text-gray-800 static">
 
                     <?php
-                    // Build item list: from WP menu OR from WC categories fallback
                     $ff_render_items = [];
                     if ( ! empty( $ff_top_items ) ) {
                         foreach ( $ff_top_items as $mi ) {
-                            // Extract product_cat slug from URL query string
                             $cat_slug = '';
                             $parsed   = parse_url( $mi->url );
                             if ( ! empty( $parsed['query'] ) ) {
@@ -83,7 +79,6 @@
                         $item_url  = $ritem['url'];
                         $item_name = $ritem['title'];
 
-                        // Load WC category object + children
                         $cat_obj    = $cat_slug ? get_term_by( 'slug', $cat_slug, 'product_cat' ) : null;
                         $child_cats = [];
                         $cat_desc   = '';
@@ -101,10 +96,9 @@
                             $thumb_url = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'medium_large' ) : '';
                         }
 
-                        // Smart split: single column if ≤5 cats, two columns if >5
                         $total_cats = count( $child_cats );
                         if ( $total_cats <= 5 ) {
-                            $col1_cats = $child_cats; // all in one column
+                            $col1_cats = $child_cats; 
                             $col2_cats = [];
                         } else {
                             $half      = (int) ceil( $total_cats / 2 );
@@ -121,7 +115,6 @@
                         <div class="absolute top-full left-0 w-full bg-white opacity-0 invisible -translate-y-2 group-hover/menuitem:opacity-100 group-hover/menuitem:visible group-hover/menuitem:translate-y-0 transition-all duration-500 overflow-hidden border-t border-gray-100 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
                             <div class="container-premium flex mx-auto py-12 gap-12">
 
-                                <!-- Col 1: Category intro -->
                                 <div class="w-1/4 pr-8 border-r border-gray-100 flex flex-col justify-center">
                                     <h3 class="text-3xl font-black text-dark tracking-tight uppercase mb-4">
                                         <?php echo esc_html( $cat_obj ? $cat_obj->name : $item_name ); ?>
@@ -140,7 +133,6 @@
                                     </a>
                                 </div>
 
-                                <!-- Col 2: Child categories (first half) -->
                                 <?php if ( ! empty( $col1_cats ) ) : ?>
                                 <div class="w-1/4">
                                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Categories</h4>
@@ -161,7 +153,6 @@
                                 </div>
                                 <?php endif; ?>
 
-                                <!-- Col 3: Child categories (second half) -->
                                 <?php if ( ! empty( $col2_cats ) ) : ?>
                                 <div class="w-1/4">
                                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">More Styles</h4>
@@ -179,7 +170,6 @@
                                 <div class="w-1/4"></div>
                                 <?php endif; ?>
 
-                                <!-- Col 4: Category promo image -->
                                 <div class="w-1/4 relative group/img overflow-hidden rounded-xl">
                                     <?php if ( $thumb_url ) : ?>
                                     <img src="<?php echo esc_url( $thumb_url ); ?>" alt="<?php echo esc_attr( $item_name ); ?>" class="w-full h-full object-cover rounded-xl group-hover/img:scale-105 transition-transform duration-700">
@@ -202,13 +192,28 @@
             </nav>
 
             <div class="flex items-center gap-6 relative z-30">
-                <button type="button" class="text-dark hover:text-premium-500 transition-colors hidden sm:block">
+                <button type="button" class="text-dark hover:text-premium-500 transition-colors hidden sm:block" @click="searchOpen = true" aria-label="Search">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </button>
 
                 <?php if ( class_exists( 'WooCommerce' ) ) : ?>
-                <div class="header-cart border-l border-gray-200 pl-6 hidden sm:block cursor-pointer" @click.prevent="cartOpen = true">
-                    <a class="cart-customlocation relative flex items-center gap-2 group" href="<?php echo esc_url( wc_get_cart_url() ); ?>" title="<?php _e( 'View your shopping cart', 'fashionfeet' ); ?>">
+                <a href="<?php echo esc_url( get_permalink( get_option('woocommerce_myaccount_page_id') ) ); ?>" class="text-dark hover:text-premium-500 transition-colors hidden sm:block" title="<?php _e( 'My Account', 'fashionfeet' ); ?>">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </a>
+                <?php endif; ?>
+
+                <?php if ( class_exists( 'WooCommerce' ) ) : ?>
+                <a href="<?php echo esc_url( home_url('/wishlist/') ); ?>" class="text-dark hover:text-premium-500 transition-colors hidden sm:block relative" title="Wishlist">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    <?php $wl_count = count( ff_get_wishlist() ); if ( $wl_count > 0 ) : ?>
+                        <span class="ff-wishlist-badge absolute -top-2 -right-3 bg-premium-500 text-white text-[10px] font-bold h-5 min-w-[20px] px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white"><?php echo $wl_count; ?></span>
+                    <?php endif; ?>
+                </a>
+                <?php endif; ?>
+
+                <?php if ( class_exists( 'WooCommerce' ) ) : ?>
+                <div class="header-cart border-l border-gray-200 pl-6 hidden sm:block cursor-pointer">
+                    <a class="cart-customlocation relative flex items-center gap-2 group" href="<?php echo esc_url( wc_get_cart_url() ); ?>" @click.prevent="cartOpen = true" title="<?php _e( 'View your shopping cart', 'fashionfeet' ); ?>">
                         <svg class="w-6 h-6 text-dark group-hover:text-premium-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                         <?php if ( WC()->cart->get_cart_contents_count() > 0 ) : ?>
                             <span class="absolute -top-2 -right-3 bg-premium-500 text-white text-[10px] font-bold h-5 min-w-[20px] px-1 rounded-full flex items-center justify-center shadow-md border-2 border-white"><?php echo WC()->cart->get_cart_contents_count(); ?></span>
@@ -260,12 +265,53 @@
                             </div>
                         </div>
 
-                        <div class="mt-8">
+                        <div class="mt-8 flex-1">
                             <div class="flow-root">
-                                <div class="text-center py-10 text-gray-400 text-sm font-medium">
-                                    <svg class="w-16 h-16 mx-auto mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                                    Your cart is currently empty.
+                                <?php if ( class_exists('WooCommerce') ) : ?>
+                                <div class="ff-mini-cart-content" id="ff-mini-cart-content">
+                                    <?php if ( WC()->cart->get_cart_contents_count() > 0 ) : ?>
+                                        <ul class="ff-mini-cart-items">
+                                            <?php foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) :
+                                                $_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
+                                                if ( ! $_product || ! $_product->exists() || $cart_item['quantity'] <= 0 ) continue;
+                                                $product_permalink = $_product->is_visible() ? $_product->get_permalink( $cart_item ) : '';
+                                            ?>
+                                            <li class="ff-mini-cart-item">
+                                                <div class="ff-mini-cart-thumb">
+                                                    <?php echo $_product->get_image( array(64, 64) ); ?>
+                                                </div>
+                                                <div class="ff-mini-cart-item-info">
+                                                    <h4 class="ff-mini-cart-item-name">
+                                                        <?php if ( $product_permalink ) : ?>
+                                                            <a href="<?php echo esc_url( $product_permalink ); ?>"><?php echo esc_html( $_product->get_name() ); ?></a>
+                                                        <?php else : ?>
+                                                            <?php echo esc_html( $_product->get_name() ); ?>
+                                                        <?php endif; ?>
+                                                    </h4>
+                                                    <?php echo wc_get_formatted_cart_item_data( $cart_item ); ?>
+                                                    <span class="ff-mini-cart-item-qty"><?php echo $cart_item['quantity']; ?> &times; <?php echo WC()->cart->get_product_price( $_product ); ?></span>
+                                                </div>
+                                                <a href="<?php echo esc_url( wc_get_cart_remove_url( $cart_item_key ) ); ?>" class="ff-mini-cart-remove" aria-label="Remove">&times;</a>
+                                            </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                        <div class="ff-mini-cart-footer">
+                                            <div class="ff-mini-cart-subtotal">
+                                                <span>Subtotal</span>
+                                                <strong><?php echo WC()->cart->get_cart_subtotal(); ?></strong>
+                                            </div>
+                                            <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="ff-mini-cart-btn ff-mini-cart-btn-outline">View Cart</a>
+                                            <a href="<?php echo esc_url( wc_get_checkout_url() ); ?>" class="ff-mini-cart-btn ff-mini-cart-btn-primary">Checkout</a>
+                                        </div>
+                                    <?php else : ?>
+                                        <div class="ff-mini-cart-empty">
+                                            <svg class="w-16 h-16 mx-auto mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                            <p class="text-sm text-gray-400">Your cart is currently empty.</p>
+                                            <a href="<?php echo esc_url( wc_get_page_permalink('shop') ); ?>" class="ff-mini-cart-btn ff-mini-cart-btn-primary" style="margin-top:16px;">Continue Shopping</a>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -311,8 +357,92 @@
                         <?php echo esc_html( $ritem['title'] ); ?>
                     </a>
                     <?php endforeach; ?>
+
+                    <?php if ( class_exists( 'WooCommerce' ) ) : ?>
+                    <div class="pt-4 mt-4 border-t border-gray-100">
+                        <a href="<?php echo esc_url( get_permalink( get_option('woocommerce_myaccount_page_id') ) ); ?>" class="px-4 py-3 text-sm font-bold uppercase tracking-widest text-dark hover:bg-gray-50 hover:text-premium-500 rounded-lg flex items-center gap-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <?php echo is_user_logged_in() ? 'My Account' : 'Login / Register'; ?>
+                        </a>
+                    </div>
+                    <?php endif; ?>
+
                 </nav>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SEARCH MODAL ═══ -->
+<div x-cloak x-show="searchOpen" class="fixed inset-0 z-[300]" role="dialog" aria-modal="true">
+    <div x-show="searchOpen"
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="searchOpen = false; searchQuery = ''; searchResults = [];"
+         class="fixed inset-0 bg-dark/80 backdrop-blur-md"></div>
+
+    <div class="fixed inset-0 flex items-start justify-center pt-[15vh] px-4 pointer-events-none">
+        <div x-show="searchOpen"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 -translate-y-8 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 -translate-y-8 scale-95"
+             @click.away="searchOpen = false; searchQuery = ''; searchResults = [];"
+             @keydown.escape.window="searchOpen = false; searchQuery = ''; searchResults = [];"
+             x-init="$watch('searchOpen', val => { if(val) $nextTick(() => $refs.searchInput.focus()) })"
+             class="w-full max-w-2xl pointer-events-auto">
+
+            <!-- Search Input -->
+            <div class="ff-search-input-wrap">
+                <svg class="ff-search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input x-ref="searchInput" type="text" x-model="searchQuery" placeholder="Search products..." class="ff-search-input"
+                    @input.debounce.350ms="
+                        if(searchQuery.length >= 2) {
+                            searchLoading = true;
+                            fetch(ffAjax.url + '?action=ff_live_search&nonce=' + ffAjax.nonce + '&q=' + encodeURIComponent(searchQuery))
+                                .then(r => r.json())
+                                .then(d => { searchResults = d.data.results; searchLoading = false; })
+                                .catch(() => { searchLoading = false; });
+                        } else { searchResults = []; }
+                    "
+                    @keydown.enter="if(searchQuery.length >= 2) window.location.href = '<?php echo esc_url( home_url('/') ); ?>?s=' + encodeURIComponent(searchQuery) + '&post_type=product';"
+                >
+                <button @click="searchOpen = false; searchQuery = ''; searchResults = [];" class="ff-search-close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Loading -->
+            <div x-show="searchLoading" class="ff-search-loading">Searching...</div>
+
+            <!-- Results -->
+            <div x-show="searchResults.length > 0 && !searchLoading" class="ff-search-results">
+                <template x-for="item in searchResults" :key="item.id">
+                    <a :href="item.url" class="ff-search-result-item">
+                        <div class="ff-search-result-thumb">
+                            <img :src="item.image || '<?php echo get_template_directory_uri(); ?>/images/placeholder.png'" :alt="item.title" />
+                        </div>
+                        <div class="ff-search-result-info">
+                            <h4 x-text="item.title"></h4>
+                            <span x-html="item.price"></span>
+                        </div>
+                    </a>
+                </template>
+                <a :href="'<?php echo esc_url( home_url('/') ); ?>?s=' + encodeURIComponent(searchQuery) + '&post_type=product'" class="ff-search-view-all">View all results &rarr;</a>
+            </div>
+
+            <!-- No results -->
+            <div x-show="searchQuery.length >= 2 && searchResults.length === 0 && !searchLoading" class="ff-search-no-results">
+                <p>No products found for "<span x-text="searchQuery"></span>"</p>
+            </div>
+
+            <p class="text-center text-gray-400 text-xs mt-4 tracking-wide">Press ESC or click outside to close</p>
         </div>
     </div>
 </div>

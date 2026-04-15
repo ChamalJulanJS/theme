@@ -27,7 +27,18 @@ if ( empty( $product ) || ! $product->is_visible() ) {
         }
         ?>
 
+        <!-- Wishlist Heart Button -->
+        <?php $in_wishlist = ff_is_in_wishlist( $product->get_id() ); ?>
+        <button type="button" class="ff-heart-btn <?php echo $in_wishlist ? 'ff-hearted' : ''; ?>" 
+                onclick="event.preventDefault(); event.stopPropagation(); ffToggleHeart(<?php echo $product->get_id(); ?>, this);"
+                aria-label="<?php echo $in_wishlist ? 'Remove from wishlist' : 'Add to wishlist'; ?>">
+            <svg class="ff-heart-icon" width="20" height="20" viewBox="0 0 24 24" fill="<?php echo $in_wishlist ? 'currentColor' : 'none'; ?>" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+        </button>
+
         <!-- Primary Image -->
+
         <?php
         $thumbnail = $product->get_image( 'woocommerce_thumbnail', array( 'class' => 'absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out z-10' ) );
         echo $thumbnail;

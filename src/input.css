@@ -70,7 +70,29 @@
   }
   
   .woocommerce-message, .woocommerce-error, .woocommerce-info {
-    @apply bg-gray-50 border-t-4 border-premium-500 text-dark p-6 mb-8 font-medium shadow-sm !important;
+    @apply bg-white border-l-4 text-dark p-5 mb-8 font-semibold shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] rounded-r-xl flex flex-col gap-2 !important;
+    list-style: none !important;
+  }
+  .woocommerce-message {
+    @apply border-green-500 text-green-700 !important;
+  }
+  .woocommerce-error {
+    @apply border-red-500 text-red-600 !important;
+  }
+  .woocommerce-info {
+    @apply border-blue-500 text-blue-700 !important;
+  }
+  
+  .woocommerce-message::before, .woocommerce-error::before, .woocommerce-info::before {
+    display: none !important;
+  }
+  
+  .woocommerce-error li, .woocommerce-info li, .woocommerce-message li {
+    @apply m-0 p-0 text-[13px] tracking-wide !important;
+  }
+  
+  .woocommerce-message .button {
+    @apply ml-4 bg-green-50 text-green-700 border-green-200 hover:bg-green-600 hover:border-green-600 py-2 px-4 rounded-md !important;
   }
 
   .woocommerce form .form-row input.input-text, 

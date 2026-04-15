@@ -10,6 +10,18 @@ if ( post_password_required() ) {
     return;
 }
 ?>
+
+<!-- Breadcrumb Navigation -->
+<nav class="ff-breadcrumb" aria-label="Breadcrumb">
+    <?php woocommerce_breadcrumb( array(
+        'delimiter'   => ' <span class="ff-breadcrumb-sep">/</span> ',
+        'wrap_before' => '<div class="ff-breadcrumb-inner">',
+        'wrap_after'  => '</div>',
+        'before'      => '<span>',
+        'after'       => '</span>',
+    ) ); ?>
+</nav>
+
 <style>
 /* Luxury Typography & Layout - Matching Mockup */
 body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #111; }
