@@ -16,7 +16,7 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 
     <?php do_action( 'woocommerce_before_shop_loop_item' ); ?>
 
-    <a href="<?php echo esc_url( apply_filters( 'woocommerce_loop_product_link', get_the_permalink(), $product ) ); ?>" class="block relative overflow-hidden bg-gray-100 w-full" style="aspect-ratio: 1 / 1;">
+    <a href="<?php echo esc_url( apply_filters( 'woocommerce_loop_product_link', get_the_permalink(), $product ) ); ?>" class="block relative overflow-hidden bg-[#f4f4f4] w-full" style="aspect-ratio: 1 / 1;">
         
         <?php
         // Out of stock badge or Sale badge
@@ -40,14 +40,14 @@ if ( empty( $product ) || ! $product->is_visible() ) {
         <!-- Primary Image -->
 
         <?php
-        $thumbnail = $product->get_image( 'woocommerce_thumbnail', array( 'class' => 'absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out z-10' ) );
+        $thumbnail = $product->get_image( 'full', array( 'class' => 'absolute inset-0 w-full h-full object-contain p-6 transform group-hover:scale-125 transition-transform duration-700 ease-in-out mix-blend-multiply z-10' ) );
         echo $thumbnail;
         
         // Secondary Image on hover (if gallery has images)
         $attachment_ids = $product->get_gallery_image_ids();
         if ( $attachment_ids ) {
             $secondary_image_id = $attachment_ids[0];
-            echo wp_get_attachment_image( $secondary_image_id, 'woocommerce_thumbnail', false, array( 'class' => 'absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-0 group-hover:opacity-100 z-15' ) );
+            echo wp_get_attachment_image( $secondary_image_id, 'full', false, array( 'class' => 'absolute inset-0 w-full h-full object-contain p-6 transform group-hover:scale-125 transition-transform duration-700 ease-in-out opacity-0 group-hover:opacity-100 mix-blend-multiply z-15' ) );
         }
         ?>
 
@@ -66,11 +66,7 @@ if ( empty( $product ) || ! $product->is_visible() ) {
             </a>
         </h2>
         
-        <!-- Category tags if needed -->
-        <div class="text-xs text-gray-400 uppercase tracking-widest mb-4">
-            <?php echo wc_get_product_category_list( $product->get_id(), ', ' ); ?>
-        </div>
-        
+
         <div class="mb-4">
             <div class="font-bold text-dark text-xl group-hover:text-premium-500 transition-colors">
                 <?php echo $product->get_price_html(); ?>

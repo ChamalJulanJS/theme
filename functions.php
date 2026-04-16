@@ -8,6 +8,12 @@ add_filter( 'woocommerce_show_page_title', function() {
 
 // Theme Setup
 function fashionfeet_setup() {
+    // Force deactivate conflicting Elementor Header & Footer plugin
+    if ( ! function_exists( 'deactivate_plugins' ) ) {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    }
+    deactivate_plugins( 'header-footer-elementor/header-footer-elementor.php' );
+
     // WooCommerce Support
     add_theme_support( 'woocommerce' );
     add_theme_support( 'wc-product-gallery-zoom' );

@@ -64,15 +64,7 @@ body.home main {
 }
 
 /* 3. GRID SYSTEM - පේළියකට 4ක් ගාණට මැදට ගැනීම */
-ul.products {
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 30px !important;
-    padding: 0 !important;
-    margin: 20px 0 !important;
-    list-style: none !important;
-    clear: both;
-}
+/* WooCommerce Product Grid - Now handled by Tailwind in src/input.css for proper responsiveness */
 
 /* 4. PRODUCT CARD - Minimalist */
 ul.products li.product {
@@ -1950,22 +1942,14 @@ html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
         display: none;
     }
 
-    .woocommerce ul.products {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 16px !important;
-    }
+    /* Responsive grids handled by Tailwind */
 
     .ff-shop-main {
         padding: 12px;
     }
 }
 
-@media (max-width: 480px) {
-    .woocommerce ul.products {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 10px !important;
-    }
-}
+/* 480px grid handled by Tailwind */
 
 /* ========================================================
    14. CHECKOUT PAGE — Premium Split-Screen Layout
