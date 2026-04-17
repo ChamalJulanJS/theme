@@ -138,10 +138,10 @@ get_header(); ?>
             
             <?php if ( class_exists('WooCommerce') ) : ?>
             <div class="mt-16 text-center">
-                <a href="<?php echo wc_get_page_permalink( 'shop' ); ?>" class="group relative inline-flex items-center justify-center px-10 py-5 text-sm font-bold tracking-[0.2em] text-white uppercase bg-dark overflow-hidden rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                    <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-premium-500 rounded-full group-hover:w-full group-hover:h-full opacity-100 z-0"></span>
-                    <span class="relative z-10 flex items-center">View Entire Shop <svg class="ml-3 w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg></span>
-                </a>
+               <a href="<?php echo wc_get_page_permalink( 'shop' ); ?>" class="group relative inline-flex items-center justify-center px-10 py-5 text-sm font-bold tracking-[0.2em] text-white hover:text-dark uppercase bg-dark overflow-hidden rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+    <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-premium-500 rounded-full group-hover:w-full group-hover:h-full opacity-100 z-0"></span>
+    <span class="relative z-10 flex items-center">View Entire Shop <svg class="ml-3 w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg></span>
+</a>
             </div>
             <?php endif; ?>
         </div>
