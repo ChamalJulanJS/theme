@@ -81,9 +81,12 @@ ul.products li.product {
 /* පින්තූරය තියෙන කොටස */
 ul.products li.product img {
     width: 100% !important;
-    height: 320px !important;
-    object-fit: cover !important;
-    background-color: #f5f5f5;
+    height: auto !important;
+min-height: 300px !important;
+max-height: 500px !important;
+    object-fit: contain !important;
+    background-color: #ffffff !important;
+    padding: 20px !important;
     border-radius: 4px;
     margin-bottom: 15px !important;
     display: block !important;
@@ -849,8 +852,6 @@ a:hover {
     width: 100%;
     height: 380px;
     object-fit: cover;
-    mix-blend-mode: multiply;
-    filter: contrast(1.05) brightness(1.03); /* Bleaches out light grey photo backgrounds */
     transition: transform 0.8s ease;
     display: block;
 }
@@ -4730,4 +4731,645 @@ body.woocommerce-checkout .entry-header {
 
 .ff-policy-link.ff-policy-disabled::after {
     display: none;
+}
+
+/* ============================================
+   🎯 FINAL: IMAGE + MATCHING BG BOX
+============================================ */
+
+/* Grid Layout - 3 columns */
+.woocommerce ul.products,
+ul.products {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 24px !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+@media (max-width: 1024px) {
+    .woocommerce ul.products,
+    ul.products {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .woocommerce ul.products,
+    ul.products {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+}
+
+/* Product Card - White container */
+.woocommerce ul.products li.product,
+ul.products li.product {
+    float: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    clear: none !important;
+    background: #fff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+}
+
+/* Image container = GREY BOX (pitipassa) */
+.woocommerce ul.products li.product > a.woocommerce-LoopProduct-link,
+.woocommerce ul.products li.product > a:first-of-type,
+ul.products li.product > a.woocommerce-LoopProduct-link,
+ul.products li.product > a:first-of-type {
+    display: block !important;
+    width: 100% !important;
+    padding-bottom: 100% !important;
+    height: 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: #e8e8e8 !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Image = SHOE (issarahin, same size as grey box) */
+.woocommerce ul.products li.product img,
+ul.products li.product img,
+ul.products li.product .wp-post-image,
+ul.products li.product .attachment-woocommerce_thumbnail {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    mix-blend-mode: multiply !important;
+    filter: none !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    border-radius: 0 !important;
+    z-index: 2 !important;
+    transition: transform 0.5s ease !important;
+}
+
+/* Hover zoom */
+.woocommerce ul.products li.product:hover img,
+ul.products li.product:hover img {
+    transform: scale(1.05) !important;
+}
+
+/* Title - White area below */
+.woocommerce ul.products li.product .woocommerce-loop-product__title,
+ul.products li.product .woocommerce-loop-product__title {
+    background: #fff !important;
+    padding: 18px 20px 6px !important;
+    margin: 0 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #111 !important;
+    line-height: 1.3 !important;
+}
+
+/* Price */
+.woocommerce ul.products li.product .price,
+ul.products li.product .price {
+    background: #fff !important;
+    padding: 0 20px 18px !important;
+    margin: 0 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #111 !important;
+    display: block !important;
+}
+
+/* Button */
+.woocommerce ul.products li.product .button,
+ul.products li.product .button,
+ul.products li.product .add_to_cart_button,
+ul.products li.product .select_options {
+    display: block !important;
+    width: 100% !important;
+    margin: auto 0 0 !important;
+    padding: 18px !important;
+    border-radius: 0 !important;
+    background: #111 !important;
+    color: #fff !important;
+    border: none !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    transition: background 0.3s ease !important;
+}
+
+.woocommerce ul.products li.product .button:hover,
+ul.products li.product .button:hover {
+    background: #C5A859 !important;
+    color: #fff !important;
+}
+
+/* Card hover - subtle shadow */
+.woocommerce ul.products li.product:hover,
+ul.products li.product:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+}
+
+/* ============================================
+   ✨ FINAL PERFECT FIX - Center Shoe in Grey Box
+============================================ */
+
+/* Image container - grey square, centered content */
+.woocommerce ul.products li.product > a.woocommerce-LoopProduct-link,
+.woocommerce ul.products li.product > a:first-of-type,
+ul.products li.product > a.woocommerce-LoopProduct-link,
+ul.products li.product > a:first-of-type {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    padding: 30px !important;
+    padding-bottom: 30px !important;
+    height: auto !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: #e8e8e8 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Image - centered, natural size, blend with bg */
+.woocommerce ul.products li.product img,
+ul.products li.product img,
+ul.products li.product .wp-post-image,
+ul.products li.product .attachment-woocommerce_thumbnail {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    background: transparent !important;
+    mix-blend-mode: multiply !important;
+    filter: none !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    border-radius: 0 !important;
+    transition: transform 0.5s ease !important;
+}
+
+/* Hover zoom */
+.woocommerce ul.products li.product:hover img,
+ul.products li.product:hover img {
+    transform: scale(1.05) !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .woocommerce ul.products li.product > a.woocommerce-LoopProduct-link,
+    ul.products li.product > a:first-of-type {
+        padding: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .woocommerce ul.products li.product > a.woocommerce-LoopProduct-link,
+    ul.products li.product > a:first-of-type {
+        padding: 15px !important;
+    }
+}
+
+/* ============================================
+   ✨ FINAL FIX - Box height = Image height
+============================================ */
+
+/* Image container - auto height (wraps image tightly) */
+.woocommerce ul.products li.product > a.woocommerce-LoopProduct-link,
+.woocommerce ul.products li.product > a:first-of-type,
+ul.products li.product > a.woocommerce-LoopProduct-link,
+ul.products li.product > a:first-of-type {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    aspect-ratio: unset !important;
+    padding: 25px !important;
+    padding-bottom: 25px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: #e8e8e8 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Image - natural size, fits box height */
+.woocommerce ul.products li.product img,
+ul.products li.product img,
+ul.products li.product .wp-post-image,
+ul.products li.product .attachment-woocommerce_thumbnail {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 400px !important;
+    min-height: 200px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    background: transparent !important;
+    mix-blend-mode: multiply !important;
+    filter: none !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    border-radius: 0 !important;
+    transition: transform 0.5s ease !important;
+    aspect-ratio: auto !important;
+}
+
+/* Hover zoom */
+.woocommerce ul.products li.product:hover img,
+ul.products li.product:hover img {
+    transform: scale(1.05) !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .woocommerce ul.products li.product > a.woocommerce-LoopProduct-link,
+    ul.products li.product > a:first-of-type {
+        padding: 20px !important;
+    }
+    
+    .woocommerce ul.products li.product img,
+    ul.products li.product img {
+        max-height: 320px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .woocommerce ul.products li.product > a.woocommerce-LoopProduct-link,
+    ul.products li.product > a:first-of-type {
+        padding: 15px !important;
+    }
+    
+    .woocommerce ul.products li.product img,
+    ul.products li.product img {
+        max-height: 260px !important;
+    }
+}
+
+/* ============================================
+   ✨ ZERO TOP GAP - Image touches top
+============================================ */
+
+.woocommerce ul.products li.product > a.woocommerce-LoopProduct-link,
+.woocommerce ul.products li.product > a:first-of-type,
+ul.products li.product > a.woocommerce-LoopProduct-link,
+ul.products li.product > a:first-of-type {
+    padding: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.woocommerce ul.products li.product img,
+ul.products li.product img {
+    max-height: none !important;
+    min-height: 0 !important;
+}
+
+/* ============================================
+   🏠 HOME PAGE - Compact Product Cards
+   (Shop page එකට බලපාන්නේ නෑ)
+============================================ */
+
+/* Featured products section - 4 columns grid on desktop */
+body.home #featured-products ul.products,
+body.home .ff-products-section ul.products {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Tablet - 3 columns */
+@media (max-width: 1024px) {
+    body.home #featured-products ul.products,
+    body.home .ff-products-section ul.products {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 16px !important;
+    }
+}
+
+/* Small tablet - 2 columns */
+@media (max-width: 768px) {
+    body.home #featured-products ul.products,
+    body.home .ff-products-section ul.products {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 14px !important;
+    }
+}
+
+/* Small mobile - 2 columns (still compact, NOT 1 column) */
+@media (max-width: 480px) {
+    body.home #featured-products ul.products,
+    body.home .ff-products-section ul.products {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+}
+
+/* Home page cards - smaller */
+body.home #featured-products ul.products li.product,
+body.home .ff-products-section ul.products li.product {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Smaller title on home */
+body.home #featured-products ul.products li.product .woocommerce-loop-product__title,
+body.home .ff-products-section ul.products li.product .woocommerce-loop-product__title {
+    font-size: 13px !important;
+    padding: 14px 16px 4px !important;
+}
+
+/* Smaller price on home */
+body.home #featured-products ul.products li.product .price,
+body.home .ff-products-section ul.products li.product .price {
+    font-size: 14px !important;
+    padding: 0 16px 14px !important;
+}
+
+/* Smaller button on home */
+body.home #featured-products ul.products li.product .button,
+body.home .ff-products-section ul.products li.product .button {
+    padding: 14px !important;
+    font-size: 11px !important;
+    letter-spacing: 1.5px !important;
+}
+
+/* Mobile - even smaller text */
+@media (max-width: 480px) {
+    body.home #featured-products ul.products li.product .woocommerce-loop-product__title,
+    body.home .ff-products-section ul.products li.product .woocommerce-loop-product__title {
+        font-size: 11px !important;
+        padding: 10px 12px 3px !important;
+    }
+
+    body.home #featured-products ul.products li.product .price,
+    body.home .ff-products-section ul.products li.product .price {
+        font-size: 12px !important;
+        padding: 0 12px 10px !important;
+    }
+
+    body.home #featured-products ul.products li.product .button,
+    body.home .ff-products-section ul.products li.product .button {
+        padding: 10px !important;
+        font-size: 10px !important;
+        letter-spacing: 1px !important;
+    }
+}
+
+/* ============================================
+   🛍️ SHOP PAGE - Back to 3 columns (not home page)
+============================================ */
+
+/* Shop page - 3 columns grid */
+body.woocommerce-shop ul.products,
+body.woocommerce.archive ul.products,
+body.tax-product_cat ul.products,
+.woocommerce-page:not(.home) ul.products,
+body.post-type-archive-product ul.products {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 24px !important;
+}
+
+@media (max-width: 1024px) {
+    body.woocommerce-shop ul.products,
+    body.woocommerce.archive ul.products,
+    body.tax-product_cat ul.products,
+    .woocommerce-page:not(.home) ul.products,
+    body.post-type-archive-product ul.products {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 600px) {
+    body.woocommerce-shop ul.products,
+    body.woocommerce.archive ul.products,
+    body.tax-product_cat ul.products,
+    .woocommerce-page:not(.home) ul.products,
+    body.post-type-archive-product ul.products {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+}
+
+/* Shop page - bigger title/price/button (reset from home override) */
+body.woocommerce-shop ul.products li.product .woocommerce-loop-product__title,
+body.tax-product_cat ul.products li.product .woocommerce-loop-product__title,
+body.post-type-archive-product ul.products li.product .woocommerce-loop-product__title {
+    font-size: 15px !important;
+    padding: 18px 20px 6px !important;
+}
+
+body.woocommerce-shop ul.products li.product .price,
+body.tax-product_cat ul.products li.product .price,
+body.post-type-archive-product ul.products li.product .price {
+    font-size: 16px !important;
+    padding: 0 20px 18px !important;
+}
+
+body.woocommerce-shop ul.products li.product .button,
+body.tax-product_cat ul.products li.product .button,
+body.post-type-archive-product ul.products li.product .button {
+    padding: 18px !important;
+    font-size: 12px !important;
+    letter-spacing: 2px !important;
+} 
+
+/* ============================================
+   🛍️ SHOP PAGE - Smaller Compact Cards (4 columns)
+============================================ */
+
+/* Shop page - 4 columns grid on desktop */
+body.woocommerce-shop ul.products,
+body.woocommerce.archive ul.products,
+body.tax-product_cat ul.products,
+.woocommerce-page:not(.home) ul.products,
+body.post-type-archive-product ul.products {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 16px !important;
+}
+
+/* Large tablet - 3 columns */
+@media (max-width: 1200px) {
+    body.woocommerce-shop ul.products,
+    body.woocommerce.archive ul.products,
+    body.tax-product_cat ul.products,
+    .woocommerce-page:not(.home) ul.products,
+    body.post-type-archive-product ul.products {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 14px !important;
+    }
+}
+
+/* Tablet - 2 columns */
+@media (max-width: 768px) {
+    body.woocommerce-shop ul.products,
+    body.woocommerce.archive ul.products,
+    body.tax-product_cat ul.products,
+    .woocommerce-page:not(.home) ul.products,
+    body.post-type-archive-product ul.products {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+}
+
+/* Small mobile - 2 columns (still compact) */
+@media (max-width: 480px) {
+    body.woocommerce-shop ul.products,
+    body.woocommerce.archive ul.products,
+    body.tax-product_cat ul.products,
+    .woocommerce-page:not(.home) ul.products,
+    body.post-type-archive-product ul.products {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+}
+
+/* Shop cards - SMALLER text */
+body.woocommerce-shop ul.products li.product .woocommerce-loop-product__title,
+body.tax-product_cat ul.products li.product .woocommerce-loop-product__title,
+body.post-type-archive-product ul.products li.product .woocommerce-loop-product__title {
+    font-size: 12px !important;
+    padding: 12px 14px 3px !important;
+    letter-spacing: 0.3px !important;
+}
+
+body.woocommerce-shop ul.products li.product .price,
+body.tax-product_cat ul.products li.product .price,
+body.post-type-archive-product ul.products li.product .price {
+    font-size: 13px !important;
+    padding: 0 14px 12px !important;
+}
+
+body.woocommerce-shop ul.products li.product .button,
+body.tax-product_cat ul.products li.product .button,
+body.post-type-archive-product ul.products li.product .button {
+    padding: 12px !important;
+    font-size: 10px !important;
+    letter-spacing: 1.5px !important;
+}
+
+/* Heart button smaller */
+body.woocommerce-shop .ff-heart-btn,
+body.tax-product_cat .ff-heart-btn,
+body.post-type-archive-product .ff-heart-btn {
+    width: 30px !important;
+    height: 30px !important;
+    top: 8px !important;
+    right: 8px !important;
+}
+
+body.woocommerce-shop .ff-heart-btn svg,
+body.tax-product_cat .ff-heart-btn svg,
+body.post-type-archive-product .ff-heart-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+/* Mobile - even smaller */
+@m
+
+/* ============================================
+   🚨 FORCE COMPACT HEADER - MAX SPECIFICITY
+============================================ */
+
+html body .site-header,
+html body header.site-header,
+html body header.sticky,
+html body.home .site-header,
+html body.home .site-header.header-scrolled,
+html body:not(.home) .site-header {
+    padding: 6px 0 !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    min-height: 0 !important;
+    height: auto !important;
+}
+
+html body .site-header .custom-logo,
+html body .site-header img.custom-logo,
+html body .site-branding img.custom-logo,
+html body .site-branding img,
+html body.home .site-header .custom-logo {
+    max-height: 28px !important;
+    height: 28px !important;
+    width: auto !important;
+}
+
+/* Target Tailwind header if exists */
+html body header[class*="py-"],
+html body header.sticky[class*="py-"] {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+
+/* Reduce container height too */
+html body .site-header .container-premium,
+html body .site-header > div,
+html body header.sticky > div,
+html body header > div {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    min-height: 0 !important;
+}
+
+/* Nav links compact */
+html body .ff-mega-menu > .ff-mega-item > a {
+    padding: 6px 12px !important;
+    font-size: 11px !important;
+}
+
+/* Icons container compact */
+html body .site-header .header-icons {
+    padding: 0 !important;
 }
