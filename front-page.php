@@ -74,15 +74,15 @@ get_header(); ?>
                         $extra_class = 'md:col-span-2 lg:col-span-1';
                     }
                 ?>
-                <div class="group relative h-[350px] sm:h-[400px] overflow-hidden rounded-xl shadow-lg cursor-pointer <?php echo esc_attr( $extra_class ); ?>">
-                    <div class="absolute inset-0 bg-dark/30 z-10 group-hover:bg-dark/50 transition-colors duration-500"></div>
-                    <img src="<?php echo esc_url( $cat_image ); ?>" alt="<?php echo esc_attr( $cat->name ); ?>" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy">
-                    <div class="absolute inset-x-0 bottom-0 z-20 p-6 sm:p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <h3 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-widest mb-1"><?php echo esc_html( $cat->name ); ?></h3>
-                        <p class="text-white/70 text-sm mb-3"><?php echo $cat_count; ?> <?php echo $cat_count === 1 ? 'Product' : 'Products'; ?></p>
-                        <a href="<?php echo esc_url( $cat_link ); ?>" class="inline-flex items-center text-premium-400 font-bold uppercase text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">View Collection <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    </div>
-                </div>
+               <a href="<?php echo esc_url( $cat_link ); ?>" class="ff-cat-card <?php echo esc_attr( $extra_class ); ?>">
+    <img src="<?php echo esc_url( $cat_image ); ?>" alt="<?php echo esc_attr( $cat->name ); ?>" class="ff-cat-image">
+    <div class="ff-cat-overlay"></div>
+    <div class="ff-cat-content">
+        <h3 class="ff-cat-title"><?php echo esc_html( $cat->name ); ?></h3>
+        <p class="ff-cat-count"><?php echo $cat_count; ?> <?php echo $cat_count === 1 ? 'Product' : 'Products'; ?></p>
+        <span class="ff-cat-link-text">View Collection <svg class="ml-2 w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></span>
+    </div>
+</a>
                 <?php endforeach; ?>
             </div>
             <?php else : ?>

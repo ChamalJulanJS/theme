@@ -363,12 +363,48 @@ $current_cat_slug = isset( $_GET['product_cat'] ) ? sanitize_text_field( $_GET['
             </div>
         <?php else : ?>
             <div class="ff-no-products">
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
-                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    <div class="ff-no-products-icon">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-linecap="round"/>
+            <line x1="8" y1="11" x2="14" y2="11" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <h3 class="ff-no-products-title">No Products Found</h3>
+    <p class="ff-no-products-desc">
+        <?php if ( $active_filter_count > 0 ) : ?>
+            Sorry, we couldn't find any products matching your current filters. Try adjusting your selection or browse our full collection.
+        <?php else : ?>
+            This category is empty right now. Check back soon for new arrivals or explore our other collections.
+        <?php endif; ?>
+    </p>
+    <div class="ff-no-products-actions">
+        <?php if ( $active_filter_count > 0 ) : ?>
+            <a href="<?php echo esc_url( wc_get_page_permalink('shop') ); ?>" class="ff-reset-link ff-btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10"/>
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
                 </svg>
-                <p>No products match your filters.</p>
-                <a href="<?php echo esc_url( wc_get_page_permalink('shop') ); ?>" class="ff-reset-link">Clear All Filters</a>
-            </div>
+                Clear All Filters
+            </a>
+        <?php endif; ?>
+        <a href="<?php echo esc_url( wc_get_page_permalink('shop') ); ?>" class="ff-browse-link ff-btn-outline">
+            Browse Shop
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/>
+                <polyline points="12 5 19 12 12 19" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+    </div>
+    <div class="ff-no-products-suggest">
+        <p>Popular searches:</p>
+        <div class="ff-suggest-tags">
+            <a href="<?php echo esc_url( wc_get_page_permalink('shop') ); ?>?product_cat=men">Men's Sneakers</a>
+            <a href="<?php echo esc_url( wc_get_page_permalink('shop') ); ?>?product_cat=women">Women's Heels</a>
+            <a href="<?php echo esc_url( wc_get_page_permalink('shop') ); ?>?product_cat=accessories">Accessories</a>
+        </div>
+    </div>
+</div>
         <?php endif; ?>
 
     </div>
